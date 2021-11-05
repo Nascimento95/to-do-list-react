@@ -36,6 +36,7 @@ class Form extends React.Component{
                     className="form-control"  
                     placeholder="entrez du texte"
                     onChange={this.handleTaskDescriptionChange}
+                    value ={this.state.task}
                 />
                 
                 <button 

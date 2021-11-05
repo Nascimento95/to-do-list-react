@@ -1,51 +1,96 @@
-import React from "react";
+// List.js
+//    -> Gere l'affichage des taches
+//    -> Remontée de données
+//        - Suppression d'une tache
+//        - Modification d'une tache
+//    -> Gere son state a lui
+//        - Condition pour afficher la tache ou le formulaire de modif
 
-class List extends React.Component{
-    constructor() {
-        super()
-        this.state = {
-          task1: [],
-          task2: []
-        }
-        
-        
-      }
-  render(){
-    //   console.log(" log des props de list tasks ", this.props.tasks);
-      const { tasks, suprimer, modifier } = this.props
-       let array = [tasks, ...this.state.task1]
-        // let push = [tasks, ...this.state.task1]
-        console.log("task1 dans list.js", this.state.task1);
-    return(
-      
-        <div className="container ">
-            {tasks.map((tache, index) =>  tache = 
-                <div id={index} className="row border border-5">
-                    <div className="col-4">
-                        <h2>description</h2>
-                        <div>
-                            <p>{tache.description}</p>
-                        </div>
-                    </div>
-                    <div className="col-4">
-                        <h2>status:</h2>
-                        <div>
-                            <p>{tache.status}</p> 
-                        </div>
-                    </div>
-                    <div className="col-4">
-                        <div className="d-flex">
-                            <button onClick={()=>suprimer(index)} type="button" className="btn btn-danger mt-3">supprimer</button>
-                            <button  onClick={()=> modifier(index)} type="button" className="btn btn-primary mt-3">modifier</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-      
+import React, { Component } from 'react'
+
+import Task from './Task'
+import EditTaskForm from './EditTaskForm'
+
+class List extends Component {
+  constructor() {
+    super()
+
+    // state initial
+    this.state = {
+      editIndex: null,
+      editDescription: "",
+      editStatus: ""
+    }
+
+    this.setEditIndex = this.setEditIndex.bind(this)
+    this.handleTaskDescriptionChange = this.handleTaskDescriptionChange.bind(this)
+    this.handleStatusChange = this.handleStatusChange.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+    this.reset = this.reset.bind(this)
+  }
+
+  setEditIndex(index) {
+    this.setState({
+      editIndex: index,
+      editDescription: this.props.tasks[index].description,
+      editStatus: this.props.tasks[index].status
+    })
+  }
+
+  handleTaskDescriptionChange(e) {
+    this.setState({ editDescription: e.target.value })
+  }
+
+  handleStatusChange(e) {
+    this.setState({ editStatus: e.target.value })
+  }
+
+  handleSubmit(e) {
+    e.preventDefault()
+    const { editIndex, editDescription, editStatus } = this.state
+    
+    this.props.modifyTask(editIndex, editDescription, editStatus)    
+    this.reset()
+  }
+
+  reset() {
+    this.setState({
+      editIndex: null,
+      editDescription: "",
+      editStatus: ""
+    })
+  }
+
+  render() {
+    return (
+      <div className="mt-5">
+        <h3>List</h3>
+        <ul className="list-group">
+          {this.props.tasks.length === 0 && <p>No tasks yet</p>}
+          {this.props.tasks.map((task, index) => (
+            <li key={index} className="list-group-item">
+              {this.state.editIndex !== index ? (
+                <Task
+                  task={task}
+                  index={index}
+                  deleteTask={this.props.deleteTask}
+                  setEditIndex={this.setEditIndex}
+                />
+              ) : (
+                <EditTaskForm
+                  editDescription={this.state.editDescription}
+                  handleTaskDescriptionChange={this.handleTaskDescriptionChange}
+                  handleStatusChange={this.handleStatusChange}
+                  handleSubmit={this.handleSubmit}
+                  reset={this.reset}
+                />
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     )
   }
 }
 
-
-export default List;
+export default List
